@@ -128,6 +128,23 @@ class StationResource(Resource):
             print("Error : " , e)
             return df
     
+    def put(self,PatientId):
+        try:
+            patient = Patient.query.get(PatientId)
+            if patient is None:
+                return "Sorry!  Patient with provided ID doesn't exist. Please check the PatientId again."
+            updated_patient = Patient_Schema.load(request.json)
+            db.session.commit()
+            result = Patient_Schema.dump(updated_patient)
+            return jsonify(result)
+        except Exception as e:
+            df = {
+                "Error Status" : "404: Bad Request",
+                "Error Message" : e.args[0]
+            }
+            print("Error : " , e)
+            return df
+    
     
 api.add_resource(PatientList, "/AllPatients/")
 api.add_resource(StationResource, "/Patients/<int:PatientId>/")
