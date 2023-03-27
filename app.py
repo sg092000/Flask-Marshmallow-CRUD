@@ -80,7 +80,7 @@ class StationResource(Resource):
         try:
             patient = Patient.query.get(PatientId)
             if patient is None:
-                return "Sorry!  Patient with provided ID doesn't exist. Please check the PatientId again."
+                return "Sorry! Patient with provided ID doesn't exist. Please check the PatientId again."
             Result = Patient_Schema.dump(patient)
             return jsonify(Result)
         except Exception as e:
@@ -95,7 +95,7 @@ class StationResource(Resource):
         try:
             patient = Patient.query.get(PatientId)
             if patient is None:
-                    return "Sorry!  Patient with provided ID doesn't exist. Please check the PatientId again."
+                    return "Sorry! Patient with provided ID doesn't exist. Please check the PatientId again."
             if "PatientId" in request.json:
                 patient.PatientId = request.json["PatientId"]
             if "PatientFirstName" in request.json:
@@ -132,11 +132,27 @@ class StationResource(Resource):
         try:
             patient = Patient.query.get(PatientId)
             if patient is None:
-                return "Sorry!  Patient with provided ID doesn't exist. Please check the PatientId again."
+                return "Sorry! Patient with provided ID doesn't exist. Please check the PatientId again."
             updated_patient = Patient_Schema.load(request.json)
             db.session.commit()
-            result = Patient_Schema.dump(updated_patient)
-            return jsonify(result)
+            Patient_Schema.dump(updated_patient)
+            return redirect("/AllPatients/")
+        except Exception as e:
+            df = {
+                "Error Status" : "404: Bad Request",
+                "Error Message" : e.args[0]
+            }
+            print("Error : " , e)
+            return df
+        
+    def delete(self, PatientId):
+        try:
+            patient = Patient.query.get(PatientId)
+            if patient is None:
+                    return "Sorry! Patient with provided ID doesn't exist. Please check the PatientId again."
+            db.session.delete(patient)
+            db.session.commit()
+            return redirect("/AllPatients/")
         except Exception as e:
             df = {
                 "Error Status" : "404: Bad Request",
