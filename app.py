@@ -1,4 +1,4 @@
-from flask import Flask , request , redirect
+from flask import Flask , request , redirect , jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_restful import Api, Resource
@@ -38,8 +38,9 @@ Patients_Schema = PatientSchema(many=True)
 class PatientList(Resource):
     def get(self):
         try:
-            stations = Patient.query.all()
-            return Patients_Schema.dump(stations)
+            patients = Patient.query.all()
+            result = Patients_Schema.dump(patients)
+            return jsonify(result)
         except Exception as e:
             df = {
                 "Error Status" : "404: Bad Request",
@@ -73,9 +74,26 @@ class PatientList(Resource):
             }
             print("Error : " , e)
             return df
+        
+class StationResource(Resource):
+    def get(self, PatientId):
+        try:
+            patient = Patient.query.get(PatientId)
+            if patient is None:
+                return "Sorry!  Patient with provided ID doesn't exist. Please check the PatientId again."
+            Result = Patient_Schema.dump(patient)
+            return jsonify(Result)
+        except Exception as e:
+            df = {
+                "Error Status" : "404: Bad Request",
+                "Error Message" : e.args[0]
+            }
+            print("Error : " , e)
+            return df
     
     
 api.add_resource(PatientList, "/AllPatients/")
+api.add_resource(StationResource, "/Patients/<int:PatientId>/")
 
 if __name__ == "__main__":
     app.run(debug=True)
