@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask , request , redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_restful import Api, Resource
@@ -37,9 +37,42 @@ Patients_Schema = PatientSchema(many=True)
 
 class PatientList(Resource):
     def get(self):
-        #exception handling to do
-        stations = Patient.query.all()
-        return Patients_Schema.dump(stations)
+        try:
+            stations = Patient.query.all()
+            return Patients_Schema.dump(stations)
+        except Exception as e:
+            df = {
+                "Error Status" : "404: Bad Request",
+                "Error Message" : e.args[0]
+            }
+            print("Error : " , e)
+            return df
+    
+    def post(self):
+        try:
+            NewPatient = Patient (
+                PatientId = request.json["PatientId"],
+                PatientFirstName = request.json["PatientFirstName"],
+                PatientLastName = request.json["PatientLastName"],
+                SufferingFrom = request.json["SufferingFrom"],
+                DoctorAssigned = request.json["DoctorAssigned"],
+                PhoneNumber = request.json["PhoneNumber"],
+                AdmitDate = request.json["AdmitDate"],
+                Address = request.json["Address"],
+                WardNo = request.json["WardNo"],
+                BedNo = request.json["BedNo"]
+            )
+            db.session.add(NewPatient)
+            db.session.commit()
+            Patient_Schema.dump(NewPatient)
+            return redirect("/AllPatients/")
+        except Exception as e:
+            df = {
+                "Error Status" : "404: Bad Request",
+                "Error Message" : e.args[0]
+            }
+            print("Error : " , e)
+            return df
     
     
 api.add_resource(PatientList, "/AllPatients/")
