@@ -66,7 +66,7 @@ class PatientList(Resource):
             db.session.add(NewPatient)
             db.session.commit()
             Patient_Schema.dump(NewPatient)
-            return redirect("/AllPatients/")
+            return {"Message" : "Successfully added your record"} , 200
         except Exception as e:
             df = {
                 "Error Status" : "404: Bad Request",
@@ -75,7 +75,7 @@ class PatientList(Resource):
             print("Error : " , e)
             return df
         
-class StationResource(Resource):
+class PatientResource(Resource):
     def get(self, PatientId):
         try:
             patient = Patient.query.get(PatientId)
@@ -95,7 +95,7 @@ class StationResource(Resource):
         try:
             patient = Patient.query.get(PatientId)
             if patient is None:
-                    return "Sorry!  Patient with provided ID doesn't exist. Please check the PatientId again."
+                return "Sorry! Patient with provided ID doesn't exist. Please check the PatientId again."
             if "PatientId" in request.json:
                 patient.PatientId = request.json["PatientId"]
             if "PatientFirstName" in request.json:
@@ -119,7 +119,7 @@ class StationResource(Resource):
                 
             db.session.commit()
             Patient_Schema.dump(patient)
-            return redirect("/AllPatients/")
+            return {"Message" : "Successfully updated your record"} , 200
         except Exception as e:
             df = {
                 "Error Status" : "404: Bad Request",
@@ -130,7 +130,7 @@ class StationResource(Resource):
     
     
 api.add_resource(PatientList, "/AllPatients/")
-api.add_resource(StationResource, "/Patients/<int:PatientId>/")
+api.add_resource(PatientResource, "/Patients/<int:PatientId>/")
 
 if __name__ == "__main__":
     app.run(debug=True)
