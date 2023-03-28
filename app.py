@@ -65,8 +65,7 @@ class PatientList(Resource):
             )
             db.session.add(NewPatient)
             db.session.commit()
-            Patient_Schema.dump(NewPatient)
-            return redirect("/AllPatients/")
+            return Patient_Schema.dump(NewPatient)
         except Exception as e:
             df = {
                 "Error Status" : "404: Bad Request",
@@ -75,7 +74,7 @@ class PatientList(Resource):
             print("Error : " , e)
             return df
         
-class StationResource(Resource):
+class PatientResource(Resource):
     def get(self, PatientId):
         try:
             patient = Patient.query.get(PatientId)
@@ -118,8 +117,7 @@ class StationResource(Resource):
                 patient.BedNo = request.json["BedNo"]
                 
             db.session.commit()
-            Patient_Schema.dump(patient)
-            return redirect("/AllPatients/")
+            return Patient_Schema.dump(patient)
         except Exception as e:
             df = {
                 "Error Status" : "404: Bad Request",
@@ -135,8 +133,7 @@ class StationResource(Resource):
                 return "Sorry! Patient with provided ID doesn't exist. Please check the PatientId again."
             updated_patient = Patient_Schema.load(request.json)
             db.session.commit()
-            Patient_Schema.dump(updated_patient)
-            return redirect("/AllPatients/")
+            return Patient_Schema.dump(updated_patient)
         except Exception as e:
             df = {
                 "Error Status" : "404: Bad Request",
@@ -152,7 +149,7 @@ class StationResource(Resource):
                     return "Sorry! Patient with provided ID doesn't exist. Please check the PatientId again."
             db.session.delete(patient)
             db.session.commit()
-            return redirect("/AllPatients/")
+            return {"Message" : "Successfully Deleted your record."},200
         except Exception as e:
             df = {
                 "Error Status" : "404: Bad Request",
@@ -163,7 +160,7 @@ class StationResource(Resource):
     
     
 api.add_resource(PatientList, "/AllPatients/")
-api.add_resource(StationResource, "/Patients/<int:PatientId>/")
+api.add_resource(PatientResource, "/Patients/<int:PatientId>/")
 
 if __name__ == "__main__":
     app.run(debug=True)
