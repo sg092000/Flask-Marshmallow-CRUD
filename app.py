@@ -65,7 +65,8 @@ class PatientList(Resource):
             )
             db.session.add(NewPatient)
             db.session.commit()
-            return Patient_Schema.dump(NewPatient)
+            Patient_Schema.dump(NewPatient)
+            return {"Message" : "Successfully Added your record."},200
         except Exception as e:
             df = {
                 "Error Status" : "404: Bad Request",
@@ -94,8 +95,10 @@ class PatientResource(Resource):
         try:
             patient = Patient.query.get(PatientId)
             if patient is None:
-                    return "Sorry! Patient with provided ID doesn't exist. Please check the PatientId again."
-            if "PatientId" in request.json:
+                return "Sorry! Patient with provided ID doesn't exist. Please check the PatientId again."
+            user_data = Patient_Schema.load(request.get_json(), partial=True)
+
+            """if "PatientId" in request.json:
                 patient.PatientId = request.json["PatientId"]
             if "PatientFirstName" in request.json:
                 patient.PatientFirstName = request.json["PatientFirstName"]
@@ -114,10 +117,9 @@ class PatientResource(Resource):
             if "WardNo" in request.json:
                 patient.WardNo = request.json["WardNo"]
             if "BedNo" in request.json:
-                patient.BedNo = request.json["BedNo"]
-                
+                patient.BedNo = request.json["BedNo"]"""
             db.session.commit()
-            return Patient_Schema.dump(patient)
+            return Patient_Schema.dump(user_data)
         except Exception as e:
             df = {
                 "Error Status" : "404: Bad Request",
