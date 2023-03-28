@@ -66,7 +66,7 @@ class PatientList(Resource):
             db.session.add(NewPatient)
             db.session.commit()
             Patient_Schema.dump(NewPatient)
-            return {"Message" : "Successfully Added your record."},200
+            return {"Message" : "Successfully added your record."},200
         except Exception as e:
             df = {
                 "Error Status" : "404: Bad Request",
